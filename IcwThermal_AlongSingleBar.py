@@ -63,5 +63,5 @@ for i in range(0,numberOfSegments):
 
 # Place a legend to the right of this smaller subplot.
 plt.legend(bbox_to_anchor=(0.75, 0.95), loc=2, borderaxespad=0.)
-drawCuShape(copperBarGeometry)
+drawCuShape(copperBarGeometry, True)
 plt.show()

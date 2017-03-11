@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #Defining fuction to draw copperbar shape
-def drawCuShape(barGeometry):
+def drawCuShape(barGeometry, isLabConnect):
 
     numberOfSegments = barGeometry.shape[0]
     #checking for max bar height in all segments
@@ -14,17 +14,24 @@ def drawCuShape(barGeometry):
     plt.figure(figsize=(12,4))
 
     for i in range(0,numberOfSegments,1):
-
+        if i== 0 or i==numberOfSegments-1:
+            colourOfBar = '#c46f1b'
+            segmentLabel = "LAB["+str(i+1)+"]"
+        else:
+            colourOfBar = '#f49b42'
+            segmentLabel = "["+str(i+1)+"]"
 
         # Ploting main coppershape of the segment
         currentY = centerY-barGeometry[i, 0]/2
         segment = plt.Rectangle((currentX, currentY),barGeometry[i, 2]\
-        ,barGeometry[i, 0], fc='orange', linestyle='dashed', edgecolor="red")
+        ,barGeometry[i, 0], fc=colourOfBar, linestyle='dashed',\
+        edgecolor='grey')
+
         plt.gca().add_patch(segment)
 
         #adding text
         plt.text(currentX + barGeometry[i, 2]/2 -5 , \
-        currentY + barGeometry[i, 0]/2 -3 ,"["+str(i+1)+"]")
+        currentY + barGeometry[i, 0]/2 -3 ,segmentLabel)
 
         if barGeometry[i, 3] != 0:
             # Drawing the hole in segment
