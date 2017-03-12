@@ -24,9 +24,12 @@ def currentIcw(time):
 
 
 # Loop for transient analysis
+print('Starting analysos...')
+
 endTime = 60*10
 numberOfSamples = 10*endTime
 ambientTemp = 24
+l= numberOfSamples-1
 
 numberOfSegments = copperBarGeometry.shape[0]
 
@@ -39,6 +42,8 @@ temperatures = np.ones((numberOfSamples, numberOfSegments))*ambientTemp
 timeTable = np.zeros(numberOfSamples)
 
 for time in range(1,numberOfSamples,1):
+
+        printProgressBar(time, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
         currentTime = time * deltaTime
 
         timeTable[time] = currentTime
