@@ -1,8 +1,30 @@
+# This is the library file
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Print iterations progress
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█'):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = '\r')
+    # Print New Line on Complete
+    if iteration == total:
+        print()
+
 #Defining fuction to draw copperbar shape
-def drawCuShape(barGeometry):
+def drawCuShape(barGeometry, isLabConnect):
 
     numberOfSegments = barGeometry.shape[0]
     #checking for max bar height in all segments
@@ -13,17 +35,24 @@ def drawCuShape(barGeometry):
     plt.figure(figsize=(12,4))
 
     for i in range(0,numberOfSegments,1):
-
+        if i== 0 or i==numberOfSegments-1:
+            colourOfBar = '#c46f1b'
+            segmentLabel = "LAB["+str(i+1)+"]"
+        else:
+            colourOfBar = '#f49b42'
+            segmentLabel = "["+str(i+1)+"]"
 
         # Ploting main coppershape of the segment
         currentY = centerY-barGeometry[i, 0]/2
         segment = plt.Rectangle((currentX, currentY),barGeometry[i, 2]\
-        ,barGeometry[i, 0], fc='orange', linestyle='dashed', edgecolor="red")
+        ,barGeometry[i, 0], fc=colourOfBar, linestyle='dashed',\
+        edgecolor='grey')
+
         plt.gca().add_patch(segment)
 
         #adding text
         plt.text(currentX + barGeometry[i, 2]/2 -5 , \
-        currentY + barGeometry[i, 0]/2 -3 ,"["+str(i+1)+"]")
+        currentY + barGeometry[i, 0]/2 -3 ,segmentLabel)
 
         if barGeometry[i, 3] != 0:
             # Drawing the hole in segment

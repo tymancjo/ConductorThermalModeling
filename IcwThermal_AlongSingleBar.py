@@ -1,3 +1,5 @@
+#This is the main file
+
 import numpy as np
 import matplotlib.pyplot as plt
 from IcwLib import *
@@ -31,6 +33,7 @@ ambientTemp = 24
 numberOfSegments = copperBarGeometry.shape[0]
 
 thermalGarray = generateTHermalConductance(copperBarGeometry, 401)
+print('Thermal Conductance Array: ')
 print(thermalGarray)
 
 deltaTime = float(endTime) / float(numberOfSamples)
@@ -39,6 +42,10 @@ temperatures = np.ones((numberOfSamples, numberOfSegments))*ambientTemp
 timeTable = np.zeros(numberOfSamples)
 
 for time in range(1,numberOfSamples,1):
+        #progress bar
+        printProgressBar(time, numberOfSamples -1, prefix = 'Progress:', \
+        suffix = 'Complete', length = 50)
+
         currentTime = time * deltaTime
 
         timeTable[time] = currentTime
@@ -61,5 +68,5 @@ for i in range(0,numberOfSegments):
 
 # Place a legend to the right of this smaller subplot.
 plt.legend(bbox_to_anchor=(0.75, 0.95), loc=2, borderaxespad=0.)
-drawCuShape(copperBarGeometry)
+drawCuShape(copperBarGeometry, True)
 plt.show()
