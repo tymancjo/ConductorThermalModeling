@@ -33,6 +33,7 @@ ambientTemp = 24
 numberOfSegments = copperBarGeometry.shape[0]
 
 thermalGarray = generateTHermalConductance(copperBarGeometry, 401)
+print('Thermal Conductance Array: ')
 print(thermalGarray)
 
 deltaTime = float(endTime) / float(numberOfSamples)
@@ -41,6 +42,10 @@ temperatures = np.ones((numberOfSamples, numberOfSegments))*ambientTemp
 timeTable = np.zeros(numberOfSamples)
 
 for time in range(1,numberOfSamples,1):
+        #progress bar
+        printProgressBar(time, numberOfSamples -1, prefix = 'Progress:', \
+        suffix = 'Complete', length = 50)
+
         currentTime = time * deltaTime
 
         timeTable[time] = currentTime
