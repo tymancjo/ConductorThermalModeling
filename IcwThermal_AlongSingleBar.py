@@ -17,7 +17,7 @@ from IcwLib import *
 # Cutout is assumed to be along entire segment lenght
 
 # Single bar 3 segments 2 of them with holes (beggining and end) definition
-copperBarGeometry = np.array([[100,10,100,0],[40,10,200,0],[30,10,12.5,10.4],\
+copperBarGeometry = np.array([[200,10,150,0],[40,10,100,0],[30,10,12.5,10.4],\
 [30,10,134,0],[30,10,14,14],[30,10,134-60,0],[30,10,60,0],\
 [30,10,12.5,10.4],[100,10,50+280+300,0]])
 # end of Bar geometry definition
@@ -32,8 +32,9 @@ def currentIcw(time):
         return 0
 
 #Defining the analysis parameters
-endTime = 60*10
+endTime = 720
 ambientTemp = 20.5
+barStartTemperature = 37
 
 plotSamplingInterval = 10 #in [s]
 
@@ -61,7 +62,7 @@ print(thermalGarray)
 
 deltaTime = float(endTime) / float(numberOfSamples)
 
-temperatures = np.ones((numberOfSamples, numberOfSegments))*ambientTemp
+temperatures = np.ones((numberOfSamples, numberOfSegments))*barStartTemperature
 timeTable = np.zeros(numberOfSamples)
 
 for time in range(1,numberOfSamples,1):
@@ -97,9 +98,9 @@ myDataDescription.append('time[s]')
 
 
 #for i in range(0,numberOfSegments):
-for i in [2,4,6,7]:
+for i in [2,4,6,7,8]:
 
-    plt.plot(timeTable, np.mean(np.array(temperatures)[:,i].reshape(-1,plotTimeStep), axis=1), label="["+str(i+1)+"]")
+    plt.plot(timeTable, np.mean(np.array(temperatures)[:,i].reshape(-1,plotTimeStep), axis=1), label="["+str(i)+"]")
 
     myDataArray.append(np.array(np.mean(np.array(temperatures)[:,i].reshape(-1,plotTimeStep), axis=1),))
     myDataDescription.append('Point: '+str(i))
