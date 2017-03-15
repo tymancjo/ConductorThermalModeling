@@ -17,9 +17,9 @@ from IcwLib import *
 # Cutout is assumed to be along entire segment lenght
 
 # Single bar 3 segments 2 of them with holes (beggining and end) definition
-copperBarGeometry = np.array([[200,10,150,0],[40,10,100,0],[30,10,12.5,10.4],\
-[30,10,134,0],[30,10,14,14],[30,10,134-60,0],[30,10,60,0],\
-[30,10,12.5,10.4],[100,10,50+280+300,0]])
+copperBarGeometry = np.array([[30,10,20,0],[30,10,20,0],[30,10,20,0],[30,10,20,0],[30,10,20,0],\
+[30,10,2,10],[30,10,2,10],[30,10,2,10],[30,10,2,10],[30,10,2,10],\
+[30,10,20,0],[30,10,20,0],[30,10,20,0],[30,10,20,0],[30,10,20,0]])
 # end of Bar geometry definition
 # print(copperBarGeometry)
 
@@ -32,17 +32,17 @@ def currentIcw(time):
         return 0
 
 #Defining the analysis parameters
-endTime = 720
+endTime = 100
 ambientTemp = 20.5
 barStartTemperature = 37
 
-plotSamplingInterval = 10 #in [s]
+plotSamplingInterval = 0 #in [s]
 
 # Loop for transient analysis
 if endTime > 61*60:
     numberOfSamples = 2*endTime
 else:
-    numberOfSamples = 20*endTime
+    numberOfSamples = 200*endTime
 
 
 sampleTime = numberOfSamples / endTime;
@@ -97,8 +97,8 @@ myDataDescription.append('time[s]')
 
 
 
-#for i in range(0,numberOfSegments):
-for i in [2,4,6,7,8]:
+for i in range(0,numberOfSegments):
+#for i in [2,4,6,7,8]:
 
     plt.plot(timeTable, np.mean(np.array(temperatures)[:,i].reshape(-1,plotTimeStep), axis=1), label="["+str(i)+"]")
 
