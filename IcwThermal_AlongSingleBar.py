@@ -130,7 +130,7 @@ def mainAnalysis(numerAnalizy):
 
 mainAnalysis("Results Oryginal")
 copperBarGeometry = slicer(copperBarGeometry)
-#drawCuShape(copperBarGeometry, True,"Geom SubSegments")
+
 mainAnalysis("Results SubSegments")
 
 plt.show()
