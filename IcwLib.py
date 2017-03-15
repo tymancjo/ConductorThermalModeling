@@ -24,7 +24,7 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
         print()
 
 #Defining fuction to draw copperbar shape
-def drawCuShape(barGeometry, isLabConnect):
+def drawCuShape(barGeometry, isLabConnect, figureName):
 
     numberOfSegments = barGeometry.shape[0]
     #checking for max bar height in all segments
@@ -32,7 +32,15 @@ def drawCuShape(barGeometry, isLabConnect):
     centerY = np.max(barGeometry, axis=0)[0]/2
 
     currentX = 0
-    plt.figure(figsize=(12,4))
+
+    font = {'family': 'sans',
+        'color':  'black',
+        'weight': 'normal',
+        'size': 7,
+        }
+
+
+    plt.figure(figureName, figsize=(12,4))
 
     for i in range(0,numberOfSegments,1):
         if i== 0 or i==numberOfSegments-1:
@@ -40,7 +48,7 @@ def drawCuShape(barGeometry, isLabConnect):
             segmentLabel = "LAB["+str(i)+"]"
         else:
             colourOfBar = '#f49b42'
-            segmentLabel = "["+str(i)+"]"
+            segmentLabel = str(i)
 
         # Ploting main coppershape of the segment
         currentY = centerY-barGeometry[i, 0]/2
@@ -51,8 +59,8 @@ def drawCuShape(barGeometry, isLabConnect):
         plt.gca().add_patch(segment)
 
         #adding text
-        plt.text(currentX + barGeometry[i, 2]/2 -5 , \
-        currentY + barGeometry[i, 0]/2 -3 ,segmentLabel)
+        plt.text(currentX + barGeometry[i, 2]/2, \
+        currentY + barGeometry[i, 0]/2 -3 ,segmentLabel,fontdict=font)
 
         if barGeometry[i, 3] != 0:
             # Drawing the hole in segment

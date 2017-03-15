@@ -23,5 +23,5 @@ copperBarGeometry = np.array([[30,10,20,0],[30,10,20,0],[30,10,20,0],[30,10,20,0
 # end of Bar geometry definition
 print(copperBarGeometry)
 
-copperBarGeometry = slicer(copperBarGeometry, 5)
+copperBarGeometry = slicer(copperBarGeometry)
 print(copperBarGeometry)

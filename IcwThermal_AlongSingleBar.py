@@ -6,7 +6,7 @@ import os
 import pandas as pd
 
 from IcwLib import *
-
+from geometryLib import *
 
 #loading the external config file
 
@@ -17,11 +17,17 @@ from IcwLib import *
 # Cutout is assumed to be along entire segment lenght
 
 # Single bar 3 segments 2 of them with holes (beggining and end) definition
-copperBarGeometry = np.array([[30,10,20,0],[30,10,20,0],[30,10,20,0],[30,10,20,0],[30,10,20,0],\
-[30,10,2,10],[30,10,2,10],[30,10,2,10],[30,10,2,10],[30,10,2,10],\
-[30,10,20,0],[30,10,20,0],[30,10,20,0],[30,10,20,0],[30,10,20,0]])
+
+#copperBarGeometry = np.array([[30,10,20,0],[30,10,90,0],\
+#[30,10,5,10],\
+#[30,10,90,0],[30,10,20,0]])
+
+copperBarGeometry = np.array([[100,10,50,0],[30,10,10,0],[30,10,10,10],\
+[30,10,145,0],[30,10,10,10],[30,10,145,0],\
+[30,10,10,10],[30,10,10,0],[100,10,50,0]])
 # end of Bar geometry definition
 # print(copperBarGeometry)
+
 
 
 # Defining current load
@@ -32,9 +38,9 @@ def currentIcw(time):
         return 0
 
 #Defining the analysis parameters
-endTime = 100
+endTime = 700
 ambientTemp = 20.5
-barStartTemperature = 37
+barStartTemperature = 20.5
 
 plotSamplingInterval = 0 #in [s]
 
@@ -42,80 +48,89 @@ plotSamplingInterval = 0 #in [s]
 if endTime > 61*60:
     numberOfSamples = 2*endTime
 else:
-    numberOfSamples = 200*endTime
-
-
+    numberOfSamples = 100*endTime
 sampleTime = numberOfSamples / endTime;
 
-if plotSamplingInterval == 0:
-    plotTimeStep = 1
-else:
-    plotTimeStep = int(plotSamplingInterval * sampleTime)  #to simulate the LAB thermocouples data
+def mainAnalysis(numerAnalizy):
 
-numberOfSegments = copperBarGeometry.shape[0]
+    if plotSamplingInterval == 0:
+        plotTimeStep = 1
+    else:
+        plotTimeStep = int(plotSamplingInterval * sampleTime)  #to simulate the LAB thermocouples data
 
-thermalGarray = generateTHermalConductance(copperBarGeometry, 401)
-os.system('cls' if os.name == 'nt' else 'clear') # cler console
+    numberOfSegments = copperBarGeometry.shape[0]
 
-print('Thermal Conductance Array: ')
-print(thermalGarray)
+    thermalGarray = generateTHermalConductance(copperBarGeometry, 401)
+    os.system('cls' if os.name == 'nt' else 'clear') # cler console
 
-deltaTime = float(endTime) / float(numberOfSamples)
+    print('Thermal Conductance Array: ')
+    print(thermalGarray)
 
-temperatures = np.ones((numberOfSamples, numberOfSegments))*barStartTemperature
-timeTable = np.zeros(numberOfSamples)
+    deltaTime = float(endTime) / float(numberOfSamples)
 
-for time in range(1,numberOfSamples,1):
-        #progress bar
-        printProgressBar(time, numberOfSamples -1, prefix = 'Progress:', \
-        suffix = 'Complete', length = 50)
+    temperatures = np.ones((numberOfSamples, numberOfSegments))*barStartTemperature
+    timeTable = np.zeros(numberOfSamples)
 
-        currentTime = time * deltaTime
+    for time in range(1,numberOfSamples,1):
+            #progress bar
+            printProgressBar(time, numberOfSamples -1, prefix = 'Progress:', \
+            suffix = 'Complete', length = 50)
 
-        timeTable[time] = currentTime
+            currentTime = time * deltaTime
 
-        temperatures[time] = temperatures[time-1]+ \
-        getTempDistr(copperBarGeometry,\
-        currentIcw(currentTime), deltaTime, temperatures[time -1] ,\
-        ambientTemp, 8920, 385, 3.75 ,thermalGarray, 0.35)
-        #barGeometry, Irms, timeStep, startTemp,ambientTemp, density, Cp, baseHTC, thermG, emmisivity
+            timeTable[time] = currentTime
 
-plt.ylabel('Temp [deg C]')
-plt.xlabel('time [s]')
-plt.grid(1)
-
-
-#preparing results arrays according to options
-timeTable = timeTable[0::plotTimeStep]
-
-#preparing result table for CSV file
-myDataArray =[]
-myDataArray.append(timeTable)
-#Prepareing result table for first row descriptipon
-myDataDescription = []
-myDataDescription.append('time[s]')
+            temperatures[time] = temperatures[time-1]+ \
+            getTempDistr(copperBarGeometry,\
+            currentIcw(currentTime), deltaTime, temperatures[time -1] ,\
+            ambientTemp, 8920, 385, 3.75 ,thermalGarray, 0.35)
+            #barGeometry, Irms, timeStep, startTemp,ambientTemp, density, Cp, baseHTC, thermG, emmisivity
 
 
 
-for i in range(0,numberOfSegments):
-#for i in [2,4,6,7,8]:
+    #preparing results arrays according to options
+    timeTable = timeTable[0::plotTimeStep]
 
-    plt.plot(timeTable, np.mean(np.array(temperatures)[:,i].reshape(-1,plotTimeStep), axis=1), label="["+str(i)+"]")
+    #preparing result table for CSV file
+    myDataArray =[]
+    myDataArray.append(timeTable)
+    #Prepareing result table for first row descriptipon
+    myDataDescription = []
+    myDataDescription.append('time[s]')
 
-    myDataArray.append(np.array(np.mean(np.array(temperatures)[:,i].reshape(-1,plotTimeStep), axis=1),))
-    myDataDescription.append('Point: '+str(i))
 
 
-#save data to external CSV file
-myDataArray = np.transpose(myDataArray) #transpose data to be in columns
-myDataArray = np.vstack((np.array(myDataDescription),myDataArray)) #adding 1st row with description
+    for i in range(0,numberOfSegments):
+    #for i in [2,4,6,7,8]:
+        plt.figure(numerAnalizy)
+        plt.plot(timeTable, np.mean(np.array(temperatures)[:,i].reshape(-1,plotTimeStep), axis=1), label="["+str(i)+"]")
 
-df = pd.DataFrame(myDataArray)
-df.to_csv("./thermalResults.csv")
+        myDataArray.append(np.array(np.mean(np.array(temperatures)[:,i].reshape(-1,plotTimeStep), axis=1),))
+        myDataDescription.append('Point: '+str(i))
 
-# Place a legend to the right of this smaller subplot.
 
-plt.legend(bbox_to_anchor=(0.75, 0.95), loc=2, borderaxespad=0.)
-drawCuShape(copperBarGeometry, True)
-#dipsplay plots
+    #save data to external CSV file
+    myDataArray = np.transpose(myDataArray) #transpose data to be in columns
+    myDataArray = np.vstack((np.array(myDataDescription),myDataArray)) #adding 1st row with description
+
+    df = pd.DataFrame(myDataArray)
+    #df.to_csv("./thermalResults.csv")
+
+    # Place a legend to the right of this smaller subplot.
+
+    plt.legend(bbox_to_anchor=(0.75, 0.95), loc=2, borderaxespad=0.)
+    #dipsplay plots
+    plt.ylabel('Temp [deg C]')
+    plt.xlabel('time [s]')
+    plt.grid(1)
+    drawCuShape(copperBarGeometry, True,"Geom "+ numerAnalizy)
+
+#######################################################
+#######################################################
+
+mainAnalysis("Results Oryginal")
+copperBarGeometry = slicer(copperBarGeometry)
+#drawCuShape(copperBarGeometry, True,"Geom SubSegments")
+mainAnalysis("Results SubSegments")
+
 plt.show()
