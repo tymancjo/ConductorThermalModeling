@@ -37,10 +37,10 @@ def drawCuShape(barGeometry, isLabConnect):
     for i in range(0,numberOfSegments,1):
         if i== 0 or i==numberOfSegments-1:
             colourOfBar = '#c46f1b'
-            segmentLabel = "LAB["+str(i+1)+"]"
+            segmentLabel = "LAB["+str(i)+"]"
         else:
             colourOfBar = '#f49b42'
-            segmentLabel = "["+str(i+1)+"]"
+            segmentLabel = "["+str(i)+"]"
 
         # Ploting main coppershape of the segment
         currentY = centerY-barGeometry[i, 0]/2
