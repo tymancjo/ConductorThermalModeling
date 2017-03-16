@@ -23,6 +23,27 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
     if iteration == total:
         print()
 
+#Defining function for curves plotting
+def plotCurves(timeTable,dataArray,plotName,xLabel,yLabel,curvesLabelArray):
+    #check for the amount of data to plot
+
+    curvesNumber = dataArray.shape[1]
+    
+    #Let's name the plot firure object
+    plt.figure(plotName)
+    #let's go for each column and add it to plot it with label
+    for i in range(0,curvesNumber):
+        plt.plot(timeTable, dataArray[:,i] , label="["+curvesLabelArray[i]+"]")
+
+
+    #Lets setup look of olot
+    plt.ylabel(yLabel)
+    plt.xlabel(xLabel)
+    plt.grid(1)
+    plt.legend(bbox_to_anchor=(0.75, 0.95), loc=2, borderaxespad=0.)
+
+
+
 #Defining fuction to draw copperbar shape
 def drawCuShape(barGeometry, isLabConnect, figureName):
 
@@ -102,7 +123,7 @@ def copperCp(temperatureCu):
     return 423.28-45.089*np.exp(-1*temperatureCu/192.82)
 
 def htc(temp, tempAmb, initialHTC):
-    return 0.1*initialHTC*(temp - tempAmb)**0.25
+    return 0.1*initialHTC*(abs(temp - tempAmb))**0.25
 
 
 def generateTHermalConductance(barGeometry, thermalCOnduction):
@@ -160,6 +181,7 @@ def getTempDistr(barGeometry, Irms, timeStep, startTemp,\
         Irms, startTemp[i], 58e6, 3.9e-3) \
         - thermalConvection\
         - thermalCOnduction - thermalRadiation) \
-        * timeStep / (segmentMass * copperCp(startTemp[i]))
+        * timeStep / (segmentMass * Cp)
+        #* timeStep / (segmentMass * copperCp(startTemp[i]))
 
     return segmentTemperatureRise
