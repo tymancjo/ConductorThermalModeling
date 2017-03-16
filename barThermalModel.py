@@ -30,7 +30,7 @@ copperBarGeometry = np.array([[30,10,170,0],[30,10,170,0],\
 
 
 # Defining current load
-def currentIcw(time):
+def currentValue(time):
     if time <= 3.7:
         return 0
     else:
@@ -50,45 +50,45 @@ else:
     numberOfSamples = 50*endTime
 sampleTime = numberOfSamples / endTime;
 
-def mainAnalysis(numerAnalizy, HTC, Emiss):
+def mainAnalysis(analysisName,geometryArray,timeArray, HTC, Emiss,\
+thermalConductivity,materialDensity,materialCp):
 
-    if plotSamplingInterval == 0:
-        plotTimeStep = 1
-    else:
-        plotTimeStep = int(plotSamplingInterval * sampleTime)  #to simulate the LAB thermocouples data
+    print('Starting analysis: '+ str(analysisName))
 
-    numberOfSegments = copperBarGeometry.shape[0]
+    #Getting the thermal conductivity array for given shape
+    thermalGarray = generateTHermalConductance(geometryArray, thermalConductivity)
 
-    thermalGarray = generateTHermalConductance(copperBarGeometry, 401)
-    os.system('cls' if os.name == 'nt' else 'clear') # cler console
+    numberOfSegments = geometryArray.shape[0]
 
-    print('Thermal Conductance Array: ')
-    print(thermalGarray)
+    deltaTime = timeArray[1]-timeArray[0] # getting the delta time base on the timeArray
+    numberOfSamples = timeArray.size
 
-    deltaTime = float(endTime) / float(numberOfSamples)
-
+    # Setting the initial temperatures for segments
     temperatures = np.ones((numberOfSamples, numberOfSegments))*barStartTemperature
-    timeTable = np.zeros(numberOfSamples)
 
-    for time in range(1,numberOfSamples,1):
+    calculationStep = 1 #just the counter reset
+    for time in timeArray[1:]:
             #progress bar
-            printProgressBar(time, numberOfSamples -1, prefix = 'Progress:', \
+            printProgressBar(calculationStep, numberOfSamples -1, prefix = 'Progress:', \
             suffix = 'Complete', length = 50)
 
-            currentTime = time * deltaTime
+            #currentTime = time * deltaTime
+            currentTime = time
 
-            timeTable[time] = currentTime / 60
-
-            temperatures[time] = temperatures[time-1]+ \
-            getTempDistr(copperBarGeometry,\
-            currentIcw(currentTime), deltaTime, temperatures[time -1] ,\
-            ambientTemp, 8920, 385, HTC ,thermalGarray, Emiss)
+            temperatures[calculationStep] = temperatures[calculationStep-1]+ \
+            getTempDistr(geometryArray,\
+            currentValue(currentTime), deltaTime, temperatures[calculationStep -1] ,\
+            ambientTemp, materialDensity, materialCp, HTC ,thermalGarray, Emiss)
             #barGeometry, Irms, timeStep, startTemp,ambientTemp, density, Cp, baseHTC, thermG, emmisivity
+
+            calculationStep += 1
 
     return temperatures
 
 
-ResultsData = np.array(mainAnalysis('HTC = 25, e=0.2',25,0.2))
+ResultsData = np.array(mainAnalysis(analysisName='First Study',geometryArray=copperBarGeometry,\
+timeArray=np.arange(0, 9980, 0.5), HTC=25, Emiss=0.2,\
+thermalConductivity=401, materialDensity=8920, materialCp=385))
 
 
 plotCurves(timeTable=np.arange(0, 9980, 0.5),dataArray=np.delete(ResultsData,[1,2,4],1),\
