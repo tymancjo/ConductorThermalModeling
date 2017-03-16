@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import os
+#import os
 import pandas as pd
 
 from IcwLib import *
@@ -36,62 +36,18 @@ def currentValue(time):
     else:
         return 0
 
-#Defining the analysis parameters
-endTime = 9980
-ambientTemp = 200
-barStartTemperature = 24.6
 
-plotSamplingInterval = 5 #in [s]
 
-# Loop for transient analysis
-if endTime > 61*60:
-    numberOfSamples = 2*endTime
-else:
-    numberOfSamples = 50*endTime
-sampleTime = numberOfSamples / endTime;
 
-def mainAnalysis(analysisName,geometryArray,timeArray, HTC, Emiss,\
-thermalConductivity,materialDensity,materialCp):
-
-    print('Starting analysis: '+ str(analysisName))
-
-    #Getting the thermal conductivity array for given shape
-    thermalGarray = generateTHermalConductance(geometryArray, thermalConductivity)
-
-    numberOfSegments = geometryArray.shape[0]
-
-    deltaTime = timeArray[1]-timeArray[0] # getting the delta time base on the timeArray
-    numberOfSamples = timeArray.size
-
-    # Setting the initial temperatures for segments
-    temperatures = np.ones((numberOfSamples, numberOfSegments))*barStartTemperature
-
-    calculationStep = 1 #just the counter reset
-    for time in timeArray[1:]:
-            #progress bar
-            printProgressBar(calculationStep, numberOfSamples -1, prefix = 'Progress:', \
-            suffix = 'Complete', length = 50)
-
-            #currentTime = time * deltaTime
-            currentTime = time
-
-            temperatures[calculationStep] = temperatures[calculationStep-1]+ \
-            getTempDistr(geometryArray,\
-            currentValue(currentTime), deltaTime, temperatures[calculationStep -1] ,\
-            ambientTemp, materialDensity, materialCp, HTC ,thermalGarray, Emiss)
-            #barGeometry, Irms, timeStep, startTemp,ambientTemp, density, Cp, baseHTC, thermG, emmisivity
-
-            calculationStep += 1
-
-    return temperatures
 
 
 ResultsData = np.array(mainAnalysis(analysisName='First Study',geometryArray=copperBarGeometry,\
-timeArray=np.arange(0, 9980, 0.5), HTC=25, Emiss=0.2,\
+timeArray=np.arange(0, 9980, 5), currentArray=np.ones(9980*2)*0, HTC=25, Emiss=0.2,\
+ambientTemp=200, barStartTemperature=25,\
 thermalConductivity=401, materialDensity=8920, materialCp=385))
 
 
-plotCurves(timeTable=np.arange(0, 9980, 0.5),dataArray=np.delete(ResultsData,[1,2,4],1),\
+plotCurves(timeTable=np.arange(0, 9980, 5),dataArray=np.delete(ResultsData,[1,2,4],1),\
 plotName='HTC=25.e=0.2',xLabel='time [s]',yLabel='Temperature [degC]',\
 curvesLabelArray = ['30x10','100x10'])
 

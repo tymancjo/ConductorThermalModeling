@@ -28,7 +28,7 @@ def plotCurves(timeTable,dataArray,plotName,xLabel,yLabel,curvesLabelArray):
     #check for the amount of data to plot
 
     curvesNumber = dataArray.shape[1]
-    
+
     #Let's name the plot firure object
     plt.figure(plotName)
     #let's go for each column and add it to plot it with label
@@ -185,3 +185,41 @@ def getTempDistr(barGeometry, Irms, timeStep, startTemp,\
         #* timeStep / (segmentMass * copperCp(startTemp[i]))
 
     return segmentTemperatureRise
+
+########## Main analysis function
+
+def mainAnalysis(analysisName, geometryArray, timeArray, currentArray, \
+ HTC, Emiss, thermalConductivity,materialDensity,materialCp,\
+ ambientTemp,barStartTemperature):
+
+    print('Starting analysis: '+ str(analysisName))
+
+    #Getting the thermal conductivity array for given shape
+    thermalGarray = generateTHermalConductance(geometryArray, thermalConductivity)
+
+    numberOfSegments = geometryArray.shape[0]
+
+    deltaTime = timeArray[1]-timeArray[0] # getting the delta time base on the timeArray
+    numberOfSamples = timeArray.size
+
+    # Setting the initial temperatures for segments
+    temperatures = np.ones((numberOfSamples, numberOfSegments))*barStartTemperature
+
+    calculationStep = 1 #just the counter reset
+    for time in timeArray[1:]:
+            #progress bar
+            printProgressBar(calculationStep, numberOfSamples -1, prefix = 'Progress:', \
+            suffix = 'Complete', length = 50)
+
+            #currentTime = time * deltaTime
+            currentTime = time
+
+            temperatures[calculationStep] = temperatures[calculationStep-1]+ \
+            getTempDistr(geometryArray,\
+            currentArray[calculationStep], deltaTime, temperatures[calculationStep -1] ,\
+            ambientTemp, materialDensity, materialCp, HTC ,thermalGarray, Emiss)
+            #barGeometry, Irms, timeStep, startTemp,ambientTemp, density, Cp, baseHTC, thermG, emmisivity
+
+            calculationStep += 1
+
+    return temperatures
